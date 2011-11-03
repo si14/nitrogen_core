@@ -8,8 +8,8 @@
 
 reflect() -> record_info(fields, flash).
 
-render_element(_Record) -> 
-    Terms = #panel { 
+render_element(_Record) ->
+    Terms = #panel {
         id=flash,
         class=flash_container
     },
@@ -23,7 +23,7 @@ update() ->
     % TODO - Stifle flash when we are redirecting.
     HasFlash = wf:state(has_flash),
     case HasFlash of
-        true -> 
+        true ->
             {ok, Flashes} = get_flashes(),
             wf:insert_bottom(flash, Flashes);
         _ -> ignore
@@ -40,21 +40,21 @@ add_flash(FlashID, Elements) ->
     end,
     wf:session(flashes, [{FlashID, Elements}|Flashes]).
 
-get_flashes() -> 
+get_flashes() ->
     % Create terms for an individual flash...
     F = fun({FlashID, Elements}) ->
-        InnerPanel = #panel { class=flash, actions=#show { target=FlashID, effect=blind, speed=400 }, body=[
-            #link { class=flash_close_button, text="Close", actions=#event { type=click, target=FlashID, actions=#hide { effect=blind, speed=400 } } },
+        InnerPanel = #panel { class=flash, actions=#show { target=FlashID, effect=blind, speed="fast" }, body=[
+            #link { class=flash_close_button, text="Close", actions=#event { type=click, target=FlashID, actions=#hide{} } },
             #panel { class=flash_content, body=Elements }
         ]},
         #panel { id=FlashID, style="display: none;", body=InnerPanel}
     end,
 
     % Get flashes, and clear session...
-    Flashes = case wf:session(flashes, []) of 
+    Flashes = case wf:session(flashes, []) of
         undefined -> [];
         Other -> Other
-    end,	
+    end,
 
     % Return list of terms...
     Flashes1 = [F(X) || X <- lists:reverse(Flashes)],
